@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/Scenes/Cellular Automata 3D.unity
-  isLoaded: 1
-  isActive: 1
