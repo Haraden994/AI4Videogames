@@ -515,7 +515,7 @@ MonoBehaviour:
   randomFillPercent: 50
   deathThreshold: 9
   liveThreshold: 17
-  smoothness: 5
+  smoothness: 8
   wallThresholdSize: 20
   roomThresholdSize: 20
   whiteCube: {fileID: 8094822105213258953, guid: 81c7ed7c69efa264eac6f509a414b4fd,
