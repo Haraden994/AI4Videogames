@@ -22,6 +22,7 @@ public class MapGenerator3D : MonoBehaviour
     [SerializeField] private int smoothness;
     [SerializeField] private int wallThresholdSize;
     [SerializeField] private int roomThresholdSize;
+    [SerializeField] private int passagewayRadius;
     
     [SerializeField] private GameObject whiteCube;
     [SerializeField] private GameObject blackCube;
@@ -138,11 +139,14 @@ public class MapGenerator3D : MonoBehaviour
                 survivingRooms.Add(new Room(roomRegion, map));
             }
         }
-        
-        survivingRooms.Sort();
-        survivingRooms[0].isMainRoom = true;
-        survivingRooms[0].isAccessibleFromMainRoom = true;
-        ConnectClosestRooms(survivingRooms);
+
+        if (survivingRooms.Count != 0)
+        {
+            survivingRooms.Sort();
+            survivingRooms[0].isMainRoom = true;
+            survivingRooms[0].isAccessibleFromMainRoom = true;
+            ConnectClosestRooms(survivingRooms);
+        }
     }
 
     void ConnectClosestRooms(List<Room> rooms, bool forceAccessibilityFromMainRoom = false)
@@ -219,13 +223,13 @@ public class MapGenerator3D : MonoBehaviour
 
                 if (possibleConnectionFound && !forceAccessibilityFromMainRoom)
                 {
-                    CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+                    CreatePassageway(bestRoomA, bestRoomB, bestTileA, bestTileB);
                 }
             }
 
             if (possibleConnectionFound && forceAccessibilityFromMainRoom)
             {
-                CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+                CreatePassageway(bestRoomA, bestRoomB, bestTileA, bestTileB);
                 ConnectClosestRooms(rooms, true);
             }
             
@@ -236,12 +240,145 @@ public class MapGenerator3D : MonoBehaviour
         }
     }
 
-    void CreatePassage(Room roomA, Room roomB, Coord tileA, Coord tileB)
+    void CreatePassageway(Room roomA, Room roomB, Coord tileA, Coord tileB)
     {
         Room.ConnectRooms(roomA, roomB);
-        Debug.DrawLine(CoordToWorldPoint(tileA), CoordToWorldPoint(tileB), Color.red, 50);
+        //Debug.DrawLine(CoordToWorldPoint(tileA), CoordToWorldPoint(tileB), Color.red, 50);
+        List<Coord> passageway = GetPassageway(tileA, tileB);
+        foreach (Coord coord in passageway)
+        {
+            DrawSphere(coord, passagewayRadius);
+        }
+    }
+    
+    // Bresenham's 3D line algorithm to find the line between two rooms.
+    List<Coord> GetPassageway(Coord from, Coord to)
+    {
+        int x = from.tileX;
+        int y = from.tileY;
+        int z = from.tileZ;
+        
+        // Direction values
+        int xdir, ydir, zdir;
+        // Slope error values
+        int sle1, sle2;
+        
+        List<Coord> passageway = new List<Coord>();
+        passageway.Add(from);
+        
+        // Distance between coordinates 
+        int dx = Math.Abs(to.tileX - from.tileX);
+        int dy = Math.Abs(to.tileY - from.tileY);
+        int dz = Math.Abs(to.tileZ - from.tileZ);
+
+        if (to.tileX > from.tileX)
+            xdir = 1;
+        else
+            xdir = -1;
+        if (to.tileY > from.tileY)
+            ydir = 1;
+        else
+            ydir = -1;
+        if (to.tileZ > from.tileZ)
+            zdir = 1;
+        else
+            zdir = -1;
+        
+        // X is the driving axis
+        if (dx >= dy && dx >= dz)
+        {
+            sle1 = 2 * dy - dx;
+            sle2 = 2 * dz - dx;
+            while (x != to.tileX)
+            {
+                x += xdir;
+                if (sle1 >= 0)
+                {
+                    y += ydir;
+                    sle1 -= 2 * dx;
+                }
+                if (sle2 >= 0)
+                {
+                    z += zdir;
+                    sle2 -= 2 * dx;
+                }
+                sle1 += 2 * dy;
+                sle2 += 2 * dz;
+                passageway.Add(new Coord(x,y,z));
+            }
+        }
+        
+        // Y is the driving axis
+        else if (dy >= dx && dy >= dz)
+        {
+            sle1 = 2 * dx - dy;
+            sle2 = 2 * dz - dy;
+            while (y != to.tileY)
+            {
+                y += ydir;
+                if (sle1 >= 0)
+                {
+                    x += xdir;
+                    sle1 -= 2 * dy;
+                }
+                if (sle2 >= 0)
+                {
+                    z += zdir;
+                    sle2 -= 2 * dy;
+                }
+                sle1 += 2 * dx;
+                sle2 += 2 * dz;
+                passageway.Add(new Coord(x,y,z));
+            }
+        }
+        else if (dz >= dx && dz >= dy)
+        {
+            sle1 = 2 * dy - dz;
+            sle2 = 2 * dx - dz;
+            while (z != to.tileZ)
+            {
+                z += zdir;
+                if (sle1 >= 0)
+                {
+                    y += ydir;
+                    sle1 -= 2 * dz;
+                }
+                if (sle2 >= 0)
+                {
+                    x += xdir;
+                    sle2 -= 2 * dz;
+                }
+                sle1 += 2 * dy;
+                sle2 += 2 * dx;
+                passageway.Add(new Coord(x,y,z));
+            }
+        }
+        return passageway;
     }
 
+    void DrawSphere(Coord c, int r)
+    {
+        for (int x = -r; x <= r; x++)
+        {
+            for (int y = -r; y <= r; y++)
+            {
+                for (int z = -r; z <= r; z++)
+                {
+                    if (x*x + y*y + z*z <= r*r)
+                    {
+                        int drawX = c.tileX + x;
+                        int drawY = c.tileY + y;
+                        int drawZ = c.tileZ + z;
+                        if (IsInMapRange(drawX, drawY, drawZ))
+                        {
+                            map[drawX, drawY, drawZ] = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     Vector3 CoordToWorldPoint(Coord tile)
     {
         return new Vector3(-width/2 + .5f + tile.tileX, -height/2 + .5f + tile.tileY, -depth/2 + .5f + tile.tileZ);
