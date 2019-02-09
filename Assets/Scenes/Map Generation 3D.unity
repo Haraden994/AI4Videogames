@@ -507,9 +507,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5c6ee5abceb47458417d2a040c0381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 50
-  height: 10
-  depth: 50
+  width: 40
+  height: 20
+  depth: 40
   seed: 7.013955
   useRandomSeed: 1
   randomFillPercent: 50
@@ -519,6 +519,7 @@ MonoBehaviour:
   wallThresholdSize: 20
   roomThresholdSize: 20
   passagewayRadius: 2
+  maxPassagewaySlopeValue: 1
   whiteCube: {fileID: 8094822105213258953, guid: 81c7ed7c69efa264eac6f509a414b4fd,
     type: 3}
   blackCube: {fileID: 5624054231799356004, guid: 4a3a9de7c67c45847b50f9bb55e49a10,

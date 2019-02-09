@@ -23,11 +23,12 @@ public class MapGenerator3D : MonoBehaviour
     [SerializeField] private int wallThresholdSize;
     [SerializeField] private int roomThresholdSize;
     [SerializeField] private int passagewayRadius;
+    //[SerializeField] private int maxPassagewaySlopeValue;
     
     [SerializeField] private GameObject whiteCube;
     [SerializeField] private GameObject blackCube;
     
-    private int[,,] map;
+    private bool[,,] map;
     
     void Start()
     {
@@ -49,7 +50,7 @@ public class MapGenerator3D : MonoBehaviour
 
     void Generate()
     {
-        map = new int[width, height, depth];
+        map = new bool[width, height, depth];
 
         RandomFillMap();
 
@@ -76,10 +77,10 @@ public class MapGenerator3D : MonoBehaviour
                 for (int z = 0; z < depth; z++)
                 {
                     if (x == 0 || x == width-1 || y == 0 || y == height -1 || z == 0 || z == depth - 1) {
-                        map[x,y,z] = 1;
+                        map[x,y,z] = true;
                     }
                     else {
-                        map[x,y,z] = pseudoRandom.Next(0,100) < randomFillPercent? 1: 0;
+                        map[x,y,z] = pseudoRandom.Next(0,100) < randomFillPercent? true: false;
                     }
                 }
             }
@@ -97,9 +98,9 @@ public class MapGenerator3D : MonoBehaviour
                     int neighbourWallTiles = GetSurroundingWallCount(x, y, z);
 
                     if (neighbourWallTiles > liveThreshold)
-                        map[x, y, z] = 1;
+                        map[x, y, z] = true;
                     else if (neighbourWallTiles < deathThreshold)
-                        map[x, y, z] = 0;
+                        map[x, y, z] = false;
                 }
             }
         }
@@ -108,7 +109,7 @@ public class MapGenerator3D : MonoBehaviour
     void ProcessMap()
     {
         //Get rid of wall regions under a certain threshold size.
-        List<List<Coord>> wallRegions = GetRegions(1);
+        List<List<Coord>> wallRegions = GetRegions(true);
 
         foreach (List<Coord> wallRegion in wallRegions)
         {
@@ -116,13 +117,13 @@ public class MapGenerator3D : MonoBehaviour
             {
                 foreach (Coord tile in wallRegion)
                 {
-                    map[tile.tileX, tile.tileY, tile.tileZ] = 0;
+                    map[tile.tileX, tile.tileY, tile.tileZ] = false;
                 }
             }
         }
         
         //Get rid of room regions under a certain threshold size.
-        List<List<Coord>> roomRegions = GetRegions(0);
+        List<List<Coord>> roomRegions = GetRegions(false);
         List<Room> survivingRooms = new List<Room>();
 
         foreach (List<Coord> roomRegion in roomRegions)
@@ -131,7 +132,7 @@ public class MapGenerator3D : MonoBehaviour
             {
                 foreach (Coord tile in roomRegion)
                 {
-                    map[tile.tileX, tile.tileY, tile.tileZ] = 1;
+                    map[tile.tileX, tile.tileY, tile.tileZ] = true;
                 }
             }
             else
@@ -205,22 +206,29 @@ public class MapGenerator3D : MonoBehaviour
                     {
                         Coord tileA = roomA.edgeTiles[tileIndexA];
                         Coord tileB = roomB.edgeTiles[tileIndexB];
+                        
+                        
+                        //int distanceBetweenRooms = (int) (Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow(tileA.tileZ - tileB.tileZ, 2));
+                        //int heightBetweenRooms = (int) Mathf.Pow(tileA.tileY - tileB.tileY, 2);
+                         
                         int distanceBetweenRooms = (int) (Mathf.Pow(tileA.tileX - tileB.tileX, 2) + 
                                                           Mathf.Pow(tileA.tileY - tileB.tileY, 2) + 
                                                           Mathf.Pow(tileA.tileZ - tileB.tileZ, 2));
-
-                        if (distanceBetweenRooms < bestDistance || !possibleConnectionFound)
-                        {
-                            bestDistance = distanceBetweenRooms;
-                            possibleConnectionFound = true;
-                            bestTileA = tileA;
-                            bestTileB = tileB;
-                            bestRoomA = roomA;
-                            bestRoomB = roomB;
-                        }
+                        
+                        //TODO: Implementation of maximum slope value cannot be applied since some rooms could be disconnected from the rest of the map.
+                        //if(heightBetweenRooms < maxPassagewaySlopeValue)
+                            if (distanceBetweenRooms < bestDistance || !possibleConnectionFound)
+                            {
+                                bestDistance = distanceBetweenRooms;
+                                possibleConnectionFound = true;
+                                bestTileA = tileA;
+                                bestTileB = tileB;
+                                bestRoomA = roomA;
+                                bestRoomB = roomB;
+                            }
                     }
                 }
-
+                
                 if (possibleConnectionFound && !forceAccessibilityFromMainRoom)
                 {
                     CreatePassageway(bestRoomA, bestRoomB, bestTileA, bestTileB);
@@ -331,6 +339,8 @@ public class MapGenerator3D : MonoBehaviour
                 passageway.Add(new Coord(x,y,z));
             }
         }
+        
+        // Z is the driving axis
         else if (dz >= dx && dz >= dy)
         {
             sle1 = 2 * dy - dz;
@@ -371,7 +381,7 @@ public class MapGenerator3D : MonoBehaviour
                         int drawZ = c.tileZ + z;
                         if (IsInMapRange(drawX, drawY, drawZ))
                         {
-                            map[drawX, drawY, drawZ] = 0;
+                            map[drawX, drawY, drawZ] = false;
                         }
                     }
                 }
@@ -398,7 +408,8 @@ public class MapGenerator3D : MonoBehaviour
                     {
                         if (neighbourX != gridX || neighbourY != gridY || neighbourZ != gridZ)
                         {
-                            wallCount += map[neighbourX, neighbourY, neighbourZ];
+                            if(map[neighbourX, neighbourY, neighbourZ])
+                                wallCount++;
                         }
                     }
                     else
@@ -415,7 +426,7 @@ public class MapGenerator3D : MonoBehaviour
         return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth;
     }
 
-    List<List<Coord>> GetRegions(int tileType)
+    List<List<Coord>> GetRegions(bool tileType)
     {
         List<List<Coord>> regions = new List<List<Coord>>();
         int[,,] mapFlags = new int[width, height, depth];
@@ -447,12 +458,12 @@ public class MapGenerator3D : MonoBehaviour
     List<Coord> GetRegionTiles(int startX, int startY, int startZ)
     {
         List<Coord> tiles = new List<Coord>();
-        int[,,] mapFlags = new int[width, height, depth];
-        int tileType = map[startX, startY, startZ];
+        bool[,,] mapFlags = new bool[width, height, depth];
+        bool tileType = map[startX, startY, startZ];
         
         Queue<Coord> queue = new Queue<Coord>();
         queue.Enqueue(new Coord(startX, startY, startZ));
-        mapFlags[startX, startY, startZ] = 1;
+        mapFlags[startX, startY, startZ] = true;
         
         while (queue.Count > 0)
         {
@@ -467,9 +478,9 @@ public class MapGenerator3D : MonoBehaviour
                     {
                         if (IsInMapRange(x, y, z) && (x == tile.tileX || y == tile.tileY || z == tile.tileZ))
                         {
-                            if (mapFlags[x, y, z] == 0 && map[x, y, z] == tileType)
+                            if (!mapFlags[x, y, z] && map[x, y, z] == tileType)
                             {
-                                mapFlags[x, y, z] = 1;
+                                mapFlags[x, y, z] = true;
                                 queue.Enqueue(new Coord(x, y, z));
                             }
                         }
@@ -504,9 +515,9 @@ public class MapGenerator3D : MonoBehaviour
                 for (int z = 0; z < depth; z++)
                 {
                     Vector3 position = new Vector3(-width/2 + x + .5f,-height/2 + y + .5f, -depth/2 + z + .5f);
-                    if (map[x, y, z] == 0)
+                    if (!map[x, y, z])
                         Instantiate(whiteCube, position, whiteCube.transform.rotation);
-                    //if (map[x, y, z] == 1)
+                    //if (map[x, y, z])
                     //    Instantiate(blackCube, position, whiteCube.transform.rotation);
                 }
             }
@@ -524,7 +535,7 @@ public class MapGenerator3D : MonoBehaviour
         
         public Room(){}
         
-        public Room(List<Coord> roomTiles, int[,,] map)
+        public Room(List<Coord> roomTiles, bool[,,] map)
         {
             tiles = roomTiles;
             roomSize = tiles.Count;
@@ -541,7 +552,7 @@ public class MapGenerator3D : MonoBehaviour
                         {
                             if (x == tile.tileX || y == tile.tileY || z == tile.tileZ)
                             {
-                                if (map[x, y, z] == 1)
+                                if (map[x, y, z])
                                 {
                                     edgeTiles.Add(tile);
                                 }
