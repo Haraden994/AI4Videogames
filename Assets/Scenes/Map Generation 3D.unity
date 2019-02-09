@@ -512,14 +512,13 @@ MonoBehaviour:
   depth: 40
   seed: 7.013955
   useRandomSeed: 1
-  randomFillPercent: 50
+  randomFillPercent: 53
   deathThreshold: 9
   liveThreshold: 17
   smoothness: 8
   wallThresholdSize: 20
   roomThresholdSize: 20
   passagewayRadius: 2
-  maxPassagewaySlopeValue: 1
   whiteCube: {fileID: 8094822105213258953, guid: 81c7ed7c69efa264eac6f509a414b4fd,
     type: 3}
   blackCube: {fileID: 5624054231799356004, guid: 4a3a9de7c67c45847b50f9bb55e49a10,

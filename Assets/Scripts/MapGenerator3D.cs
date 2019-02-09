@@ -95,7 +95,7 @@ public class MapGenerator3D : MonoBehaviour
             {
                 for (int z = 0; z < depth; z++)
                 {
-                    int neighbourWallTiles = GetSurroundingWallCount(x, y, z);
+                    int neighbourWallTiles = GetNeighbourCount(x, y, z, true);
 
                     if (neighbourWallTiles > liveThreshold)
                         map[x, y, z] = true;
@@ -394,9 +394,9 @@ public class MapGenerator3D : MonoBehaviour
         return new Vector3(-width/2 + .5f + tile.tileX, -height/2 + .5f + tile.tileY, -depth/2 + .5f + tile.tileZ);
     }
     
-    int GetSurroundingWallCount(int gridX, int gridY, int gridZ)
+    int GetNeighbourCount(int gridX, int gridY, int gridZ, bool type)
     {
-        int wallCount = 0;
+        int neighbourCount = 0;
 
         for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
         {
@@ -408,17 +408,17 @@ public class MapGenerator3D : MonoBehaviour
                     {
                         if (neighbourX != gridX || neighbourY != gridY || neighbourZ != gridZ)
                         {
-                            if(map[neighbourX, neighbourY, neighbourZ])
-                                wallCount++;
+                            if(map[neighbourX, neighbourY, neighbourZ] == type)
+                                neighbourCount++;
                         }
                     }
                     else
-                        wallCount++;
+                        neighbourCount++;
                 }
             }
         }
-        //Debug.Log("WallCount: " + wallCount);
-        return wallCount;
+        //Debug.Log("WallCount: " + neighbourCount);
+        return neighbourCount;
     }
     
     bool IsInMapRange(int x, int y, int z)
@@ -508,15 +508,28 @@ public class MapGenerator3D : MonoBehaviour
     
     void DrawMap()
     {
+        GameObject cube;
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 for (int z = 0; z < depth; z++)
                 {
-                    Vector3 position = new Vector3(-width/2 + x + .5f,-height/2 + y + .5f, -depth/2 + z + .5f);
+                    Vector3 position = CoordToWorldPoint(new Coord(x, y, z));
                     if (!map[x, y, z])
-                        Instantiate(whiteCube, position, whiteCube.transform.rotation);
+                    {
+                        if (GetNeighbourCount(x, y, z, false) >= 26)
+                        {
+                            cube = Instantiate(whiteCube, position, whiteCube.transform.rotation);
+                            cube.transform.localScale.Set(2, 2, 2);
+                        }
+                        else
+                        {
+                            cube = Instantiate(whiteCube, position, whiteCube.transform.rotation);
+                            cube.transform.localScale.Set(1, 1, 1);
+                        }
+                    }
+
                     //if (map[x, y, z])
                     //    Instantiate(blackCube, position, whiteCube.transform.rotation);
                 }
