@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 public class MapGenerator3D : MonoBehaviour
 {
@@ -24,9 +25,10 @@ public class MapGenerator3D : MonoBehaviour
     [SerializeField] private int roomThresholdSize;
     [SerializeField] private int passagewayRadius;
     //[SerializeField] private int maxPassagewaySlopeValue;
-    
-    [SerializeField] private GameObject whiteCube;
-    [SerializeField] private GameObject blackCube;
+    [Space]
+    [SerializeField] private GameObject player;
+    //[SerializeField] private GameObject whiteCube;
+    //[SerializeField] private GameObject blackCube;
     
     private bool[,,] map;
     
@@ -39,11 +41,15 @@ public class MapGenerator3D : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            GameObject[] blocks = GameObject.FindGameObjectsWithTag("block");
+            /*GameObject[] blocks = GameObject.FindGameObjectsWithTag("block");
             foreach (var block in blocks)
             {
                 Destroy(block);
+            }*/
+            foreach (Transform child in transform) {
+                Destroy(child.gameObject);
             }
+            Destroy(GameObject.FindGameObjectWithTag("Player"));
             Generate();
         }
     }
@@ -60,7 +66,9 @@ public class MapGenerator3D : MonoBehaviour
         }
 
         ProcessMap();
-        DrawMap();
+        //DrawMap();
+        MeshGenerator3D meshGenerator = GetComponent<MeshGenerator3D>();
+        meshGenerator.GenerateMesh(map, width, height, depth);
     }
 
     void RandomFillMap()
@@ -68,7 +76,7 @@ public class MapGenerator3D : MonoBehaviour
         if (useRandomSeed)
             seed = Time.time.ToString();
         
-        System.Random pseudoRandom = new System.Random(seed.GetHashCode());
+        Random pseudoRandom = new Random(seed.GetHashCode());
 
         for (int x = 0; x < width; x++)
         {
@@ -80,7 +88,7 @@ public class MapGenerator3D : MonoBehaviour
                         map[x,y,z] = true;
                     }
                     else {
-                        map[x,y,z] = pseudoRandom.Next(0,100) < randomFillPercent? true: false;
+                        map[x,y,z] = pseudoRandom.Next(0,100) < randomFillPercent;
                     }
                 }
             }
@@ -148,6 +156,8 @@ public class MapGenerator3D : MonoBehaviour
             survivingRooms[0].isAccessibleFromMainRoom = true;
             ConnectClosestRooms(survivingRooms);
         }
+        
+        SpawnPlayer(survivingRooms[0]);
     }
 
     void ConnectClosestRooms(List<Room> rooms, bool forceAccessibilityFromMainRoom = false)
@@ -366,6 +376,7 @@ public class MapGenerator3D : MonoBehaviour
         return passageway;
     }
 
+    // Draw the passageway as a sequence of spheres
     void DrawSphere(Coord c, int r)
     {
         for (int x = -r; x <= r; x++)
@@ -491,6 +502,14 @@ public class MapGenerator3D : MonoBehaviour
         //Debug.Log("RegionTiles: " + tiles.Count);
         return tiles;
     }
+
+    // Spawn the player in a random position inside a room.
+    void SpawnPlayer(Room room)
+    {
+        Random rnd = new Random();
+        int r = rnd.Next(room.tiles.Count);
+        Instantiate(player, CoordToWorldPoint(room.tiles[r]), player.transform.rotation);
+    }
     
     struct Coord
     {
@@ -506,7 +525,7 @@ public class MapGenerator3D : MonoBehaviour
         }
     }
     
-    void DrawMap()
+    /*void DrawMap()
     {
         GameObject cube;
         for (int x = 0; x < width; x++)
@@ -535,7 +554,7 @@ public class MapGenerator3D : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
     
     class Room : IComparable<Room>
     {

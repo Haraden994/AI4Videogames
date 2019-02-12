@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class VisitorController : MonoBehaviour
 {
+    [SerializeField] private float movementSpeed = 20.0f;
+    
     // Start is called before the first frame update
     void Update()
     {
@@ -14,7 +16,6 @@ public class VisitorController : MonoBehaviour
         float rotationX = Input.GetAxis("Mouse Y") * rotationSpeed;
         transform.Rotate (-rotationX, rotationY , 0);
        
-        float movementSpeed = 40.0f;
         float dt = Time.deltaTime;
         float dy =  0;
         if(Input.GetKey(KeyCode.Space))
