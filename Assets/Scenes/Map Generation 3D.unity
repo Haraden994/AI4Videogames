@@ -298,7 +298,7 @@ MonoBehaviour:
   depth: 40
   seed: 7.013955
   useRandomSeed: 1
-  randomFillPercent: 53
+  randomFillPercent: 50
   deathThreshold: 9
   liveThreshold: 17
   smoothness: 8

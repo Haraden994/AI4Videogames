@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7807f2e27df74364b83c0c44c9c8091e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 20
+  movementSpeed: 5
 --- !u!143 &1942198905078466911
 CharacterController:
   m_ObjectHideFlags: 0
@@ -204,8 +204,8 @@ Light:
   serializedVersion: 8
   m_Type: 2
   m_Color: {r: 0, g: 0.78431374, b: 0, a: 1}
-  m_Intensity: 2
-  m_Range: 5
+  m_Intensity: 1.5
+  m_Range: 15
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
