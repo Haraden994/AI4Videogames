@@ -66,15 +66,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\CameraController.cs" />
-    <Compile Include="Assets\Scripts\IMarching.cs" />
-    <Compile Include="Assets\Scripts\MapGenerator.cs" />
     <Compile Include="Assets\Scripts\MapGenerator3D.cs" />
-    <Compile Include="Assets\Scripts\Marching.cs" />
-    <Compile Include="Assets\Scripts\MarchingCubes.cs" />
-    <Compile Include="Assets\Scripts\MeshGenerator.cs" />
+    <Compile Include="Assets\Scripts\Marching Cubes\IMarching.cs" />
+    <Compile Include="Assets\Scripts\Marching Cubes\Marching.cs" />
+    <Compile Include="Assets\Scripts\Marching Cubes\MarchingCubes.cs" />
     <Compile Include="Assets\Scripts\MeshGenerator3D.cs" />
-    <Compile Include="Assets\Scripts\Player.cs" />
-    <Compile Include="Assets\Scripts\Player2D.cs" />
     <Compile Include="Assets\Scripts\VisitorController.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/night/Desktop/UNIMI/AI4Videogames/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
