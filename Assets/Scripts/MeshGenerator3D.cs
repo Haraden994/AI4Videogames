@@ -44,7 +44,6 @@ public class MeshGenerator3D : MonoBehaviour
 
         for (int i = 0; i < numMeshes; i++)
         {
-
             List<Vector3> splitVerts = new List<Vector3>();
             List<int> splitIndices = new List<int>();
 

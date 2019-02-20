@@ -8,7 +8,7 @@ namespace MarchingCubesAlgorithm
 {
     public abstract class Marching
     {
-
+        //Surface is the value that represents the surface of mesh.
         public float Surface { get; set; }
 
         private float[] Cube { get; set; }
