@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace MarchingCubesProject
+namespace MarchingCubesAlgorithm
 {
-    public abstract class Marching : IMarching
+    public abstract class Marching
     {
 
         public float Surface { get; set; }
@@ -22,10 +22,10 @@ namespace MarchingCubesProject
         {
             Surface = surface;
             Cube = new float[8];
-            WindingOrder = new int[] { 0, 1, 2 };
+            WindingOrder = new [] { 0, 1, 2 };
         }
 
-        public virtual void Generate(IList<float> voxels, int width, int height, int depth, IList<Vector3> verts, IList<int> indices)
+        public void Generate(IList<float> voxels, int width, int height, int depth, IList<Vector3> verts, IList<int> indices)
         {
 
             if (Surface > 0.0f)
@@ -76,10 +76,10 @@ namespace MarchingCubesProject
         /// GetOffset finds the approximate point of intersection of the surface
         /// between two points with the values v1 and v2
         /// </summary>
-        protected virtual float GetOffset(float v1, float v2)
+        protected float GetOffset(float v1, float v2)
         {
             float delta = v2 - v1;
-            return (delta == 0.0f) ? Surface : (Surface - v1) / delta;
+            return delta == 0.0f ? Surface : (Surface - v1) / delta;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace MarchingCubesProject
         /// of each of the 8 vertices of a cube.
         /// vertexOffset[8][3]
         /// </summary>
-        protected static readonly int[,] VertexOffset = new int[,]
+        protected static readonly int[,] VertexOffset =
 	    {
 	        {0, 0, 0},{1, 0, 0},{1, 1, 0},{0, 1, 0},
 	        {0, 0, 1},{1, 0, 1},{1, 1, 1},{0, 1, 1}

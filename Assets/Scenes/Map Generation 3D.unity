@@ -296,12 +296,13 @@ MonoBehaviour:
   width: 40
   height: 20
   depth: 40
-  seed: 7.013955
+  seed: 0
   useRandomSeed: 1
-  randomFillPercent: 50
+  randomFillPercent: 53
   deathThreshold: 9
-  liveThreshold: 17
+  birthThreshold: 17
   smoothness: 8
+  doMapProcessing: 1
   wallThresholdSize: 20
   roomThresholdSize: 20
   passagewayRadius: 2

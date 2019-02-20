@@ -17,10 +17,13 @@ public class MapGenerator3D : MonoBehaviour
     [SerializeField] private bool useRandomSeed;
     [SerializeField] [Range(0,100)] private int randomFillPercent;
     
-    [Header("Map smoothing and processing values")]
+    [Header("Map smoothing values")]
     [SerializeField] private int deathThreshold;
     [SerializeField] private int birthThreshold;
     [SerializeField] private int smoothness;
+
+    [Header("Map processing values")] 
+    [SerializeField] private bool doMapProcessing;
     [SerializeField] private int wallThresholdSize;
     [SerializeField] private int roomThresholdSize;
     [SerializeField] private int passagewayRadius;
@@ -64,8 +67,8 @@ public class MapGenerator3D : MonoBehaviour
         {
             SmoothMap();
         }
-
-        ProcessMap();
+        if(doMapProcessing)
+            ProcessMap();
         //DrawMap();
         MeshGenerator3D meshGenerator = GetComponent<MeshGenerator3D>();
         meshGenerator.GenerateMesh(map, width, height, depth);

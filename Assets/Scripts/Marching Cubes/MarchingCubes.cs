@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace MarchingCubesProject
+namespace MarchingCubesAlgorithm
 {
     public class MarchingCubes : Marching
     {
@@ -23,7 +23,7 @@ namespace MarchingCubesProject
         {
             int i, j, vert, idx;
             int flagIndex = 0;
-            float offset = 0.0f;
+            float offset;
 
             //Find which vertices are inside of the surface and which are outside
             for (i = 0; i < 8; i++) if (cube[i] <= Surface) flagIndex |= 1 << i;
@@ -69,7 +69,7 @@ namespace MarchingCubesProject
         /// of the 12 edges of the cube.
         /// edgeConnection[12][2]
         /// </summary>
-        private static readonly int[,] EdgeConnection = new int[,] 
+        private static readonly int[,] EdgeConnection = 
 	    {
 	        {0,1}, {1,2}, {2,3}, {3,0},
 	        {4,5}, {5,6}, {6,7}, {7,4},
@@ -80,7 +80,7 @@ namespace MarchingCubesProject
         /// edgeDirection lists the direction vector (vertex1-vertex0) for each edge in the cube.
         /// edgeDirection[12][3]
         /// </summary>
-        private static readonly float[,] EdgeDirection = new float[,]
+        private static readonly float[,] EdgeDirection =
 	    {
 	        {1.0f, 0.0f, 0.0f},{0.0f, 1.0f, 0.0f},{-1.0f, 0.0f, 0.0f},{0.0f, -1.0f, 0.0f},
 	        {1.0f, 0.0f, 0.0f},{0.0f, 1.0f, 0.0f},{-1.0f, 0.0f, 0.0f},{0.0f, -1.0f, 0.0f},
@@ -99,7 +99,7 @@ namespace MarchingCubesProject
         /// For each entry in the table, if edge #n is intersected, then bit #n is set to 1.
         /// cubeEdgeFlags[256]
         /// </summary>
-        private static readonly int[] CubeEdgeFlags = new int[]
+        private static readonly int[] CubeEdgeFlags =
 	    {
 		0x000, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00, 
 		0x190, 0x099, 0x393, 0x29a, 0x596, 0x49f, 0x795, 0x69c, 0x99c, 0x895, 0xb9f, 0xa96, 0xd9a, 0xc93, 0xf99, 0xe90, 
@@ -128,7 +128,7 @@ namespace MarchingCubesProject
         /// and corner[1] are inside of the surface, but the rest of the cube is not.
         /// triangleConnectionTable[256][16]
         /// </summary>
-        private static readonly int[,] TriangleConnectionTable = new int[,]  
+        private static readonly int[,] TriangleConnectionTable =  
 	    {
 	    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	    {0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},

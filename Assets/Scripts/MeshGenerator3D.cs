@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using MarchingCubesProject;
+using MarchingCubesAlgorithm;
 using UnityEngine;
 
 public class MeshGenerator3D : MonoBehaviour
@@ -13,7 +13,6 @@ public class MeshGenerator3D : MonoBehaviour
     public void GenerateMesh(bool[,,] map, int width, int height, int depth)
     {
         Marching marching = new MarchingCubes();
-        marching.Surface = 0.9f;
         
         float[] voxels = new float[width * height * depth];
         
