@@ -19,7 +19,7 @@ public class MapGenerator3D : MonoBehaviour
     
     [Header("Map smoothing and processing values")]
     [SerializeField] private int deathThreshold;
-    [SerializeField] private int liveThreshold;
+    [SerializeField] private int birthThreshold;
     [SerializeField] private int smoothness;
     [SerializeField] private int wallThresholdSize;
     [SerializeField] private int roomThresholdSize;
@@ -105,7 +105,7 @@ public class MapGenerator3D : MonoBehaviour
                 {
                     int neighbourWallTiles = GetNeighbourCount(x, y, z, true);
 
-                    if (neighbourWallTiles > liveThreshold)
+                    if (neighbourWallTiles > birthThreshold)
                         map[x, y, z] = true;
                     else if (neighbourWallTiles < deathThreshold)
                         map[x, y, z] = false;
@@ -405,6 +405,7 @@ public class MapGenerator3D : MonoBehaviour
         return new Vector3(-width/2 + .5f + tile.tileX, -height/2 + .5f + tile.tileY, -depth/2 + .5f + tile.tileZ);
     }
     
+    // Method used to get the neighbors (of the given type, true or false) of a cell.
     int GetNeighbourCount(int gridX, int gridY, int gridZ, bool type)
     {
         int neighbourCount = 0;
@@ -428,10 +429,10 @@ public class MapGenerator3D : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("WallCount: " + neighbourCount);
         return neighbourCount;
     }
     
+    // Check if passed coordinates are inside of the map range.
     bool IsInMapRange(int x, int y, int z)
     {
         return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth;
@@ -499,7 +500,6 @@ public class MapGenerator3D : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("RegionTiles: " + tiles.Count);
         return tiles;
     }
 
@@ -511,6 +511,7 @@ public class MapGenerator3D : MonoBehaviour
         Instantiate(player, CoordToWorldPoint(room.tiles[r]), player.transform.rotation);
     }
     
+    // Struct used for storing map coordinates of a cell.
     struct Coord
     {
         public int tileX;
@@ -556,6 +557,7 @@ public class MapGenerator3D : MonoBehaviour
         }
     }*/
     
+    // This class is used to track each Room region of the map.
     class Room : IComparable<Room>
     {
         public List<Coord> tiles;
